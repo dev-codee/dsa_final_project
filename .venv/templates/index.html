@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DSA RIDES</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='path.svg') }}" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      nav {
+        width: 100vw;
+        height: 10vh;
+        padding: 10px;
+        box-sizing: border-box;
+        background-color: #f3f3f3;
+        display: flex;
+      }
+      .register {
+        margin-left: auto;
+        margin-right: 65px;
+        display: flex;
+        padding: 7px;
+        box-sizing: border-box;
+        gap: 15px;
+      }
+      .SignUp {
+        width: 100px;
+        height: 35px;
+        border: none;
+        border-radius: 50px;
+        padding: 5px;
+        cursor: pointer;
+        font-family: system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 18px;
+        background-color: black;
+        color: white;
+      }
+      .logIn {
+        width: 100px;
+        height: 35px;
+        border: none;
+        border-radius: 50px;
+        padding: 5px;
+        cursor: pointer;
+        font-family: system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 18px;
+        background-color: white;
+        color: black;
+        border: 2px solid black;
+      }
+      .logo {
+        margin-left: 65px;
+      }
+      .container {
+        width: 100vw;
+        height: 90vh;
+        display: flex;
+        padding: 30px;
+        box-sizing: border-box;
+      }
+      .left {
+        height: 80vh;
+        width: 45vw;
+        padding-left: 45px;
+        box-sizing: border-box;
+      }
+      .right {
+        height: 80vh;
+        width: 40vw;
+        padding-top: 70px;
+        box-sizing: border-box;
+      }
+      .heading {
+        font-family: UberMove, UberMoveText, system-ui, "Helvetica Neue",
+          Helvetica, Arial, sans-serif;
+        font-size: 50px;
+        font-weight: 700;
+        line-height: 64px;
+      }
+      .btns {
+        margin-top: 20px;
+        width: 400px;
+        height: 50px;
+        border: none;
+      }
+      .btn {
+        display: flex;
+        padding: 14px 16px;
+        border: none;
+        cursor: pointer;
+        border-radius: 50px;
+        box-sizing: border-box;
+        background-color: #f0f0f0;
+      }
+      .btn:hover {
+        background-color: #e7e7e7e7;
+      }
+      .para {
+        padding-left: 5px;
+        padding-right: 5px;
+        box-sizing: border-box;
+        font-family: system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 20px;
+      }
+      .pickup {
+        margin-top: 20px;
+        width: 400px;
+        height: 50px;
+        border-radius: 8px;
+        background-color: #f3f3f3;
+        border: none;
+        display: flex;
+        padding: 3px;
+        box-sizing: border-box;
+      }
+      .pick {
+        display: flex;
+        padding-left: 10px;
+        padding-right: 7px;
+        align-items: center;
+        border: none;
+      }
+      .pointer {
+        cursor: pointer;
+      }
+      .pointer:focus-within {
+        color: #e11900;
+      }
+      .pickup .inputField {
+        width: 100%;
+        height: 40px;
+        outline: none;
+        border: none;
+        background-color: transparent;
+        font-family: system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 450;
+        line-height: 20px;
+      }
+      .pickup:focus-within {
+        border: 2px solid black;
+        background-color: white;
+      }
+      .prices {
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+      }
+      .btnn {
+        width: 400px;
+        height: 50px;
+        border: none;
+        border-radius: 8px;
+        background-color: black;
+        color: white;
+        font-family: system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 20px;
+        cursor: pointer;
+      }
+
+      /* Mobile Responsive Styles */
+      @media (max-width: 768px) {
+        nav {
+          height: auto;
+          min-height: 60px;
+          padding: 10px 15px;
+          flex-wrap: wrap;
+        }
+
+        .logo {
+          margin-left: 15px;
+        }
+
+        .logo img {
+          height: 30px;
+        }
+
+        .register {
+          margin-right: 15px;
+          gap: 10px;
+        }
+
+        .SignUp, .logIn {
+          width: 80px;
+          height: 32px;
+          font-size: 12px;
+          padding: 4px;
+        }
+
+        .container {
+          flex-direction: column;
+          height: auto;
+          min-height: 90vh;
+          padding: 20px 15px;
+        }
+
+        .left {
+          width: 100%;
+          height: auto;
+          padding-left: 0;
+          padding-bottom: 20px;
+        }
+
+        .right {
+          width: 100%;
+          height: auto;
+          padding-top: 20px;
+          padding-left: 0;
+          display: flex;
+          justify-content: center;
+        }
+
+        .right img {
+          width: 100%;
+          max-width: 400px;
+          height: auto;
+        }
+
+        .heading {
+          font-size: 32px;
+          line-height: 40px;
+        }
+
+        .btns {
+          width: 100%;
+          max-width: 400px;
+        }
+
+        .pickup {
+          width: 100%;
+          max-width: 400px;
+        }
+
+        .btnn {
+          width: 100%;
+          max-width: 400px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .heading {
+          font-size: 24px;
+          line-height: 32px;
+        }
+
+        .SignUp, .logIn {
+          width: 70px;
+          height: 30px;
+          font-size: 11px;
+        }
+
+        .register {
+          gap: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="logo">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="logo" />
+      </div>
+      <div class="register">
+        <a href="/login"><button class="logIn">Log In</button></a>
+      </div>
+    </nav>
+    <div class="container">
+      <div class="left">
+        <h1 class="heading">Go anywhere with DSA RIDES</h1>
+        <div class="main">
+          <div class="btns">
+            <button class="btn">
+              <div class="clock">
+                <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none">
+                  <title>Clock</title>
+                  <path
+                    d="M12 1C5.9 1 1 5.9 1 12s4.9 11 11 11 11-4.9 11-11S18.1 1 12 1Zm6 13h-8V4h3v7h5v3Z"
+                    fill="currentColor"
+                  ></path>
+                </svg>
+              </div>
+              <span class="para">Pickup Now</span>
+              <div class="downArrow">
+                <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none">
+                  <title>Chevron down small</title>
+                  <path
+                    d="M18 8v3.8l-6 4.6-6-4.6V8l6 4.6L18 8Z"
+                    fill="currentColor"
+                  ></path>
+                </svg>
+              </div>
+            </button>
+          </div>
+          <div class="input">
+            <div class="pickup">
+              <div class="pick">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  data-baseweb="icon"
+                >
+                  <title>search</title>
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M12 23c6.075 0 11-4.925 11-11S18.075 1 12 1 1 5.925 1 12s4.925 11 11 11Zm0-8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+                    fill="currentColor"
+                  ></path>
+                </svg>
+              </div>
+              <input
+                type="text"
+                id="pickup"
+                name="pickup"
+                class="inputField"
+                placeholder="Pickup Location"
+              />
+              <div class="pick pointer" onclick="getCurrentLocation()">
+                <svg
+                  width="1.5em"
+                  height="1.5em"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-label="Auto-fill my location"
+                  role="button"
+                  tabindex="0"
+                >
+                  <path
+                    d="M10.5 13.5.5 11 21 3l-8 20.5-2.5-10Z"
+                    fill="currentColor"
+                  ></path>
+                </svg>
+              </div>
+            </div>
+            <div class="pickup">
+              <div class="pick">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  data-baseweb="icon"
+                >
+                  <title>search</title>
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M22 2H2v20h20V2Zm-7 7H9v6h6V9Z"
+                    fill="currentColor"
+                  ></path>
+                </svg>
+              </div>
+              <input
+                type="text"
+                id="dropoff"
+                name="dropoff"
+                class="inputField"
+                placeholder="Dropoff Location"
+              />
+            </div>
+          </div>
+          <div class="prices">
+            <button class="btnn" onclick="showalert()">See Place</button>
+          </div>
+        </div>
+      </div>
+      <div class="right">
+        <img src="{{ url_for('static', filename='banner.png') }}" alt="banner" style="max-width: 100%; height: auto;" />
+      </div>
+    </div>
+
+    <script>
+      function showalert() {
+        alert("Please login first. Thank you!!");
+      }
+      
+      function getCurrentLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            function (position) {
+              alert("Location access granted. Please use the login page to access the full features.");
+            },
+            function (error) {
+              alert("Unable to get your location. Please enter your pickup location manually.");
+            }
+          );
+        } else {
+          alert("Geolocation is not supported by your browser.");
+        }
+      }
+    </script>
+  </body>
+</html>

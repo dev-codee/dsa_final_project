@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DSA Rides — Login</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #e5e5e5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Animated gradient background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(88, 28, 135, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(15, 118, 110, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 80%, rgba(30, 64, 175, 0.1) 0%, transparent 60%);
+            animation: pulse 8s ease-in-out infinite alternate;
+            z-index: 0;
+        }
+
+        @keyframes pulse {
+            0%   { opacity: 0.6; transform: scale(1); }
+            100% { opacity: 1;   transform: scale(1.05); }
+        }
+
+        .login-card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            padding: 48px 40px;
+            background: rgba(24, 24, 27, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            text-align: center;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.03),
+                0 25px 50px -12px rgba(0, 0, 0, 0.6);
+        }
+
+        .logo {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 24px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+            color: #fafafa;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: #a1a1aa;
+            margin-bottom: 36px;
+            line-height: 1.5;
+        }
+
+        .google-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            width: 100%;
+            padding: 14px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-decoration: none;
+        }
+
+        .google-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.18);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .google-btn:active {
+            transform: translateY(0);
+        }
+
+        .google-btn svg {
+            flex-shrink: 0;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 28px 0;
+            color: #52525b;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .footer-text {
+            font-size: 0.8rem;
+            color: #52525b;
+            line-height: 1.6;
+        }
+
+        .footer-text a {
+            color: #6366f1;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-text a:hover {
+            color: #818cf8;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-card">
+        <!-- Logo -->
+        <div class="logo"><img src="../static/logo.png" alt=""></div>
+
+        <h1>DSA Rides</h1>
+        <p class="subtitle">Sign in to book your next ride</p>
+
+        <!-- Login with Google Button -->
+        <a href="/login/google" class="google-btn">
+            <svg width="22" height="22" viewBox="0 0 48 48">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.08 24.08 0 0 0 0 21.56l7.98-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+            Login with Google
+        </a>
+
+        <div class="divider">or</div>
+
+        <p class="footer-text">
+            By continuing, you agree to our
+            <a href="#">Terms of Service</a> &amp; <a href="#">Privacy Policy</a>
+        </p>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rider Dashboard - DSA RIDES</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+        background-color: #f8f8f8;
+      }
+
+      nav {
+        width: 100vw;
+        height: 70px;
+        padding: 10px 65px;
+        background-color: #ffffff;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .logo img {
+        height: 40px;
+      }
+
+      .nav-right {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .rider-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .rider-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 50px;
+        background-color: #f0f0f0;
+      }
+
+      .status-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #10b981;
+      }
+
+      .status-indicator.offline {
+        background-color: #ef4444;
+      }
+
+      .location-indicator {
+        font-size: 12px;
+        color: #666;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .location-indicator.active {
+        color: #10b981;
+      }
+
+      .toggle-status {
+        padding: 8px 20px;
+        border: none;
+        border-radius: 50px;
+        background-color: #000;
+        color: #fff;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .toggle-status:hover {
+        background-color: #333;
+      }
+
+      .logout-btn {
+        padding: 8px 20px;
+        border: 2px solid #000;
+        border-radius: 50px;
+        background-color: #fff;
+        color: #000;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 30px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+      }
+
+      .section {
+        background: #fff;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid #f0f0f0;
+      }
+
+      .section-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #000;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+
+      .stat-card {
+        padding: 20px;
+        background: #f8f8f8;
+        border-radius: 8px;
+      }
+
+      .stat-label {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 8px;
+      }
+
+      .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #000;
+      }
+
+      .earnings {
+        grid-column: span 2;
+        background: linear-gradient(135deg, #000 0%, #333 100%);
+        color: #fff;
+      }
+
+      .earnings .stat-label {
+        color: #ccc;
+      }
+
+      .earnings .stat-value {
+        color: #fff;
+        font-size: 36px;
+      }
+
+      .requests-list {
+        max-height: 600px;
+        overflow-y: auto;
+      }
+
+      .request-card {
+        border: 2px solid #e5e5e5;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        transition: all 0.2s;
+      }
+
+      .request-card.urgent {
+        border-color: #ef4444;
+        background: linear-gradient(135deg, #fef2f2 0%, #fff 100%);
+      }
+
+      .request-card:hover {
+        border-color: #000;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .request-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .request-id {
+        font-size: 14px;
+        color: #666;
+        font-weight: 600;
+      }
+
+      .urgent-badge {
+        padding: 4px 12px;
+        background: #ef4444;
+        color: #fff;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .distance-badge {
+        padding: 4px 12px;
+        background: #10b981;
+        color: #fff;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .request-time {
+        font-size: 12px;
+        color: #999;
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 600;
+      }
+
+      .user-details {
+        flex: 1;
+      }
+
+      .user-name {
+        font-weight: 600;
+        color: #000;
+        margin-bottom: 2px;
+      }
+
+      .user-rating {
+        font-size: 12px;
+        color: #666;
+      }
+
+      .location-info {
+        margin-bottom: 16px;
+      }
+
+      .location-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .location-icon {
+        width: 20px;
+        height: 20px;
+        margin-top: 2px;
+      }
+
+      .location-text {
+        flex: 1;
+      }
+
+      .location-label {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 4px;
+      }
+
+      .location-address {
+        font-size: 14px;
+        color: #000;
+        font-weight: 500;
+      }
+
+      .trip-details {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px;
+        background: #f8f8f8;
+        border-radius: 8px;
+        margin-bottom: 16px;
+      }
+
+      .trip-detail {
+        text-align: center;
+      }
+
+      .trip-detail-label {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 4px;
+      }
+
+      .trip-detail-value {
+        font-size: 16px;
+        font-weight: 600;
+        color: #000;
+      }
+
+      .fare-amount {
+        color: #10b981;
+      }
+
+      .fare-amount.urgent {
+        color: #ef4444;
+      }
+
+      .request-actions {
+        display: flex;
+        gap: 12px;
+      }
+
+      .btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .btn-accept {
+        background-color: #000;
+        color: #fff;
+      }
+
+      .btn-accept:hover {
+        background-color: #333;
+      }
+
+      .btn-decline {
+        background-color: #f0f0f0;
+        color: #000;
+      }
+
+      .btn-decline:hover {
+        background-color: #e0e0e0;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+      }
+
+      .empty-state svg {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 20px;
+        opacity: 0.3;
+      }
+
+      .empty-state-text {
+        font-size: 18px;
+        font-weight: 500;
+      }
+
+      @media (max-width: 1024px) {
+        .container {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        nav {
+          height: auto;
+          min-height: 60px;
+          padding: 10px 20px;
+          flex-wrap: wrap;
+        }
+
+        .logo {
+          margin-left: 0;
+        }
+
+        .logo img {
+          height: 30px;
+        }
+
+        .nav-right {
+          flex-wrap: wrap;
+          gap: 10px;
+          margin-top: 10px;
+          width: 100%;
+          justify-content: flex-end;
+        }
+
+        .rider-info {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 5px;
+        }
+
+        .rider-status {
+          padding: 6px 12px;
+          font-size: 12px;
+        }
+
+        .location-indicator {
+          font-size: 11px;
+        }
+
+        .toggle-status, .logout-btn {
+          padding: 6px 16px;
+          font-size: 12px;
+        }
+
+        .container {
+          padding: 15px;
+          gap: 20px;
+        }
+
+        .section {
+          padding: 16px;
+        }
+
+        .section-title {
+          font-size: 20px;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+          gap: 12px;
+        }
+
+        .stat-card {
+          padding: 16px;
+        }
+
+        .stat-value {
+          font-size: 24px;
+        }
+
+        .earnings .stat-value {
+          font-size: 28px;
+        }
+
+        .request-card {
+          padding: 16px;
+        }
+
+        .request-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+
+        .request-actions {
+          flex-direction: column;
+        }
+
+        .btn {
+          width: 100%;
+        }
+      }
+
+      @media (max-width: 480px) {
+        nav {
+          padding: 8px 15px;
+        }
+
+        .nav-right {
+          gap: 8px;
+        }
+
+        .toggle-status, .logout-btn {
+          padding: 6px 12px;
+          font-size: 11px;
+        }
+
+        .container {
+          padding: 10px;
+          gap: 15px;
+        }
+
+        .section {
+          padding: 12px;
+        }
+
+        .section-title {
+          font-size: 18px;
+        }
+
+        .stat-value {
+          font-size: 20px;
+        }
+
+        .earnings .stat-value {
+          font-size: 24px;
+        }
+
+        .request-card {
+          padding: 12px;
+        }
+
+        .user-avatar {
+          width: 35px;
+          height: 35px;
+          font-size: 14px;
+        }
+
+        .user-name {
+          font-size: 14px;
+        }
+
+        .user-rating {
+          font-size: 11px;
+        }
+
+        .location-address {
+          font-size: 13px;
+        }
+
+        .trip-detail-value {
+          font-size: 14px;
+        }
+
+        .request-id {
+          font-size: 12px;
+        }
+
+        .urgent-badge, .distance-badge {
+          font-size: 10px;
+          padding: 3px 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="logo">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="logo" />
+      </div>
+      <div class="nav-right">
+        <div class="rider-info">
+          <div class="rider-status">
+            <div class="status-indicator" id="statusIndicator"></div>
+            <span id="statusText">Online</span>
+          </div>
+          <div class="location-indicator" id="locationIndicator">
+            📍 Location Off
+          </div>
+        </div>
+        <span style="font-weight:600; color:#333;">👋 {{ name }}</span>
+        <button class="toggle-status" onclick="toggleStatus()">
+          Go Offline
+        </button>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </nav>
+
+    <div class="container">
+      <!-- Stats Section -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">Today's Stats</h2>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Completed Rides</div>
+            <div class="stat-value" id="completedRides">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Hours Online</div>
+            <div class="stat-value" id="hoursOnline">0.0</div>
+          </div>
+          <div class="stat-card earnings">
+            <div class="stat-label">Today's Earnings</div>
+            <div class="stat-value" id="todayEarnings">PKR 0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ride Requests -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">Nearby Rides</h2>
+          <span style="color: #10b981; font-weight: 600" id="requestCount"
+            >0 Available</span
+          >
+        </div>
+        <div class="requests-list" id="requestsList">
+          <!-- Requests will be loaded here -->
+        </div>
+
+      </div>
+      <!-- Active Ride -->
+        <div class="section active-ride" id="activeRideSection" style="display: none;">
+            <div class="section-header">
+                <h2 class="section-title">Active Ride</h2>
+                <span class="ride-status-badge">IN PROGRESS</span>
+            </div>
+            <div id="activeRideContent"></div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+      let isOnline = true;
+      let riderLocation = null;
+      let hoursOnlineTimer = null;
+      let startTime = Date.now();
+      let rideRequests = []; 
+let activeRide = null;
+let stats = {
+    completedRides: 0,
+    todayEarnings: 0
+};
+
+      // Get rider location on load
+      function getRiderLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            async function (position) {
+              riderLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              };
+
+              // Update location indicator
+              document.getElementById("locationIndicator").innerHTML =
+                "📍 Location On";
+              document
+                .getElementById("locationIndicator")
+                .classList.add("active");
+
+              // Send to server
+              await fetch("/api/rider/update-location", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(riderLocation),
+              });
+
+              // Load requests after getting location
+              loadRequests();
+            },
+            function (error) {
+              console.error("Location error:", error);
+              document.getElementById("locationIndicator").innerHTML =
+                "📍 Location Failed";
+              // Still load requests (will get all without filtering)
+              loadRequests();
+            }
+          );
+        } else {
+          document.getElementById("locationIndicator").innerHTML =
+            "📍 Not Supported";
+          loadRequests();
+        }
+
+        // Update location every 30 seconds
+        setInterval(async () => {
+          if (riderLocation && isOnline) {
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+              riderLocation = {
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude,
+              };
+              await fetch("/api/rider/update-location", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(riderLocation),
+              });
+            });
+          }
+        }, 30000);
+      }
+
+      function toggleStatus() {
+        isOnline = !isOnline;
+        const indicator = document.getElementById("statusIndicator");
+        const statusText = document.getElementById("statusText");
+        const toggleBtn = document.querySelector(".toggle-status");
+
+        if (isOnline) {
+          indicator.classList.remove("offline");
+          statusText.textContent = "Online";
+          toggleBtn.textContent = "Go Offline";
+          startOnlineTimer();
+          getRiderLocation();
+        } else {
+          indicator.classList.add("offline");
+          statusText.textContent = "Offline";
+          toggleBtn.textContent = "Go Online";
+          stopOnlineTimer();
+        }
+      }
+
+      function startOnlineTimer() {
+        startTime = Date.now();
+        hoursOnlineTimer = setInterval(() => {
+          const elapsed = (Date.now() - startTime) / (1000 * 60 * 60);
+          document.getElementById("hoursOnline").textContent =
+            elapsed.toFixed(1);
+        }, 60000);
+      }
+
+      function stopOnlineTimer() {
+        if (hoursOnlineTimer) {
+          clearInterval(hoursOnlineTimer);
+        }
+      }
+
+      async function loadRequests() {
+    try {
+        const response = await fetch("/api/rider/requests");
+        const data = await response.json();
+
+        if (data.success) {
+            rideRequests = data.requests || []; // Store globally
+            renderRequests(rideRequests);
+        }
+    } catch (error) {
+        console.error("Error loading requests:", error);
+    }
+}
+
+      function renderRequests(requests) {
+        const container = document.getElementById("requestsList");
+        document.getElementById(
+          "requestCount"
+        ).textContent = `${requests.length} Available`;
+
+        if (requests.length === 0) {
+          container.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="currentColor"/>
+                        </svg>
+                        <div class="empty-state-text">No nearby rides</div>
+                        <p style="margin-top: 8px; font-size: 14px;">Make sure location is enabled</p>
+                    </div>
+                `;
+          return;
+        }
+
+        container.innerHTML = requests
+          .map(
+            (request) => `
+                <div class="request-card ${
+                  request.is_urgent ? "urgent" : ""
+                }" id="card-${request.id}">
+                    <div class="request-header">
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <span class="request-id">${request.id}</span>
+                            ${
+                              request.is_urgent
+                                ? '<span class="urgent-badge">🚨 URGENT</span>'
+                                : ""
+                            }
+                            ${
+                              request.distance_to_pickup_text
+                                ? `<span class="distance-badge">${request.distance_to_pickup_text}</span>`
+                                : ""
+                            }
+                        </div>
+                        <span class="request-time">${request.time}</span>
+                    </div>
+                    
+                    <div class="user-info">
+                        <div class="user-avatar">${request.userName.charAt(
+                          0
+                        )}</div>
+                        <div class="user-details">
+                            <div class="user-name">${request.userName}</div>
+                            <div class="user-rating">⭐ ${
+                              request.userRating
+                            } rating</div>
+                        </div>
+                    </div>
+
+                    <div class="location-info">
+                        <div class="location-item">
+                            <svg class="location-icon" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="3" fill="#10b981"/>
+                            </svg>
+                            <div class="location-text">
+                                <div class="location-label">Pickup</div>
+                                <div class="location-address">${
+                                  request.pickup
+                                }</div>
+                            </div>
+                        </div>
+                        <div class="location-item">
+                            <svg class="location-icon" viewBox="0 0 24 24" fill="none">
+                                <rect x="9" y="9" width="6" height="6" fill="#000"/>
+                            </svg>
+                            <div class="location-text">
+                                <div class="location-label">Dropoff</div>
+                                <div class="location-address">${
+                                  request.dropoff
+                                }</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="trip-details">
+                        <div class="trip-detail">
+                            <div class="trip-detail-label">Distance</div>
+                            <div class="trip-detail-value">${
+                              request.distance
+                            }</div>
+                        </div>
+                        <div class="trip-detail">
+                            <div class="trip-detail-label">Duration</div>
+                            <div class="trip-detail-value">${
+                              request.duration
+                            }</div>
+                        </div>
+                        <div class="trip-detail">
+                            <div class="trip-detail-label">Fare</div>
+                            <div class="trip-detail-value fare-amount ${
+                              request.is_urgent ? "urgent" : ""
+                            }">PKR ${request.fare}</div>
+                        </div>
+                    </div>
+
+                    <div class="request-actions">
+                        <button class="btn btn-accept" onclick="acceptRide('${
+                          request.id
+                        }')">Accept Ride</button>
+                        <button class="btn btn-decline" onclick="rejectRide('${
+                          request.id
+                        }')">Decline</button>
+                    </div>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      async function acceptRide(requestId) {
+    try {
+        const response = await fetch("/api/rider/accept-ride", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ requestId }),
+        });
+
+        const data = await response.json();
+
+        if (data.success || data.message) { // Handle various API success formats
+            // Find the ride object from our local list
+            activeRide = rideRequests.find((r) => String(r.id) === String(requestId));
+            
+            // Remove it from the available list
+            rideRequests = rideRequests.filter((r) => String(r.id) !== String(requestId));
+            
+            renderRequests(rideRequests);
+            showActiveRide();
+        }
+    } catch (error) {
+        console.error("Error accepting ride:", error);
+        // Fallback for testing if API fails
+        activeRide = rideRequests.find((r) => String(r.id) === String(requestId));
+        if(activeRide) {
+            rideRequests = rideRequests.filter((r) => String(r.id) !== String(requestId));
+            renderRequests(rideRequests);
+            showActiveRide();
+        }
+    }
+}
+      async function rejectRide(requestId) {
+        try {
+          // Hide the card with animation
+          const card = document.getElementById(`card-${requestId}`);
+          if (card) {
+            card.style.opacity = "0";
+            card.style.transform = "translateX(-20px)";
+
+            setTimeout(() => {
+              card.remove();
+              updateRequestCount();
+            }, 300);
+          }
+
+          await fetch("/api/rider/reject-ride", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ requestId }),
+          });
+        } catch (error) {
+          console.error("Error rejecting ride:", error);
+        }
+      }
+      function showActiveRide() {
+    const section = document.getElementById("activeRideSection");
+    const content = document.getElementById("activeRideContent");
+
+    if (!activeRide) return;
+
+    section.style.display = "block";
+    content.innerHTML = `
+        <div class="active-ride-card" style="padding: 15px; border: 1px solid #eee; border-radius: 8px;">
+            <div class="user-info">
+                <div class="user-avatar" style="width:40px; height:40px; background:#000; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:10px;">
+                    ${activeRide.userName.charAt(0)}
+                </div>
+                <div class="user-details">
+                    <div class="user-name"><strong>${activeRide.userName}</strong></div>
+                    <div class="user-rating">⭐ ${activeRide.userRating || '5.0'} rating</div>
+                </div>
+            </div>
+            <div class="location-info" style="margin: 15px 0;">
+                <div>📍 <strong>Pickup:</strong> ${activeRide.pickup}</div>
+                <div>🏁 <strong>Dropoff:</strong> ${activeRide.dropoff}</div>
+            </div>
+            <div class="ride-actions" style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn" style="background:#eee; color:#000;" onclick="callUser()">📞 Call</button>
+                <button class="btn" style="background:#000; color:#fff;" onclick="navigate()">🗺️ Navigate</button>
+                <button class="btn" style="background:#10b981; color:#fff;" onclick="completeRide()">Complete Ride</button>
+            </div>
+        </div>
+    `;
+}
+
+      function initActiveRideMap() {
+        const map = new google.maps.Map(document.getElementById("map"), {
+          center: activeRide.pickupCoords,
+          zoom: 12,
+        });
+
+        const directionsService = new google.maps.DirectionsService();
+        const directionsRenderer = new google.maps.DirectionsRenderer({
+          map: map,
+          polylineOptions: {
+            strokeColor: "#10b981",
+            strokeWeight: 4,
+          },
+        });
+
+        directionsService.route(
+          {
+            origin: activeRide.pickupCoords,
+            destination: activeRide.dropoffCoords,
+            travelMode: "DRIVING",
+          },
+          (result, status) => {
+            if (status === "OK") {
+              directionsRenderer.setDirections(result);
+            }
+          }
+        );
+      }
+
+      async function completeRide() {
+        if (!activeRide) return;
+        
+        try {
+          const response = await fetch('/api/rider/complete-ride', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ requestId: activeRide.id })
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            stats.completedRides++;
+            stats.todayEarnings += parseInt(activeRide.fare) || 0;
+
+            document.getElementById("completedRides").textContent = stats.completedRides;
+            document.getElementById("todayEarnings").textContent = `PKR ${stats.todayEarnings}`;
+
+            activeRide = null;
+            document.getElementById("activeRideSection").style.display = "none";
+            alert("Ride completed successfully!  User has been notified.");
+          } else {
+            alert(data.error || 'Failed to complete ride');
+          }
+        } catch (error) {
+          console.error('Error completing ride:', error);
+          // Fallback - update UI anyway
+          stats.completedRides++;
+          stats.todayEarnings += parseInt(activeRide.fare) || 0;
+          document.getElementById("completedRides").textContent = stats.completedRides;
+          document.getElementById("todayEarnings").textContent = `PKR ${stats.todayEarnings}`;
+          activeRide = null;
+          document.getElementById("activeRideSection").style.display = "none";
+          alert("Ride completed! ⭐");
+        }
+      }
+
+      function callUser() {
+        alert("Calling user...");
+      }
+
+      function messageUser() {
+        alert("Opening messages...");
+      }
+
+      function navigate() {
+    if (!activeRide) return;
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(activeRide.pickup)}&destination=${encodeURIComponent(activeRide.dropoff)}&travelmode=driving`;
+    window.open(url, "_blank");
+}
+
+      function updateRequestCount() {
+        const remaining = document.querySelectorAll(".request-card").length;
+        document.getElementById(
+          "requestCount"
+        ).textContent = `${remaining} Available`;
+
+        if (remaining === 0) {
+          document.getElementById("requestsList").innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="currentColor"/>
+                        </svg>
+                        <div class="empty-state-text">No more nearby rides</div>
+                        <p style="margin-top: 8px; font-size: 14px;">New requests will appear here</p>
+                    </div>
+                `;
+        }
+      }
+
+      function logout() {
+        if (confirm("Are you sure you want to logout?")) {
+          window.location.href = "/logout";
+        }
+      }
+
+      // Initialize
+      window.onload = function () {
+        startOnlineTimer();
+        getRiderLocation();
+
+        // Refresh requests every 10 seconds
+        setInterval(() => {
+          if (isOnline) {
+            loadRequests();
+          }
+        }, 10000);
+      };
+    </script>
+  </body>
+</html>
