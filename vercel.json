@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "src": ".venv/run.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": ".venv/run.py"
+    }
+  ]
+}
