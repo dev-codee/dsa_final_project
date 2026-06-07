@@ -1,13 +1,18 @@
 import os
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
+# dotenv only loaded locally, not on Vercel
+if os.path.exists('.env'):
+    from dotenv import load_dotenv
+    load_dotenv()
 
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 from datetime import datetime
 from app.models.user import db, User
-from app.models.mongo_setup import live_locations_collection, ride_logs_collection
+try:
+    from app.models.mongo_setup import live_locations_collection, ride_logs_collection
+except Exception as e:
+    print(f"MongoDB not available: {e}")
+    live_locations_collection = None
+    ride_logs_collection = None
 from app.DataStructures.queue import RideRequestQueue
 from app.DataStructures.stack import UserRideHistoryManager
 from auth import auth_bp
@@ -16,9 +21,13 @@ app = Flask(__name__)
 
 # --- Configuration ---
 basedir = os.path.abspath(os.path.dirname(__file__))
+IS_VERCEL = os.environ.get("VERCEL", False)
 # Ensure instance directory exists
+IS_VERCEL = bool(os.environ.get("VERCEL"))
+
 instance_path = os.path.join(basedir, 'instance')
-os.makedirs(instance_path, exist_ok=True)
+if not IS_VERCEL:
+    os.makedirs(instance_path, exist_ok=True)
 # --- PostgreSQL Database Configuration ---
 # Set database URI to PostgreSQL instead of SQLite
 PG_USER = os.environ.get("PG_USER", "postgres")
@@ -27,8 +36,8 @@ PG_DB = os.environ.get("PG_DB", "rides_db")
 PG_HOST = os.environ.get("PG_HOST", "localhost")
 PG_PORT = os.environ.get("PG_PORT", "5432")
 
-# We leave the SQLite URI here as a fallback for development if Postgres is not set up
-USE_POSTGRES = os.environ.get("USE_POSTGRES", "False").lower() in ["true", "1"]
+# On Vercel, always use Postgres — SQLite filesystem is read-only
+USE_POSTGRES = IS_VERCEL or os.environ.get("USE_POSTGRES", "False").lower() in ["true", "1"]
 
 if USE_POSTGRES:
     # Vercel provides POSTGRES_URL. SQLAlchemy requires `postgresql://` instead of `postgres://`
@@ -40,12 +49,12 @@ if USE_POSTGRES:
     else:
         app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}'
 else:
-    db_path = os.path.join(instance_path, 'users.db')
+    db_path = os.path.join('/tmp', 'users.db') if IS_VERCEL else os.path.join(instance_path, 'users.db')
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
     
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', '1234') 
-GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY', "AIzaSyDwpdSiu8lCLt9Y5ttql_MujzlSJgt-ig0")
+GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY')
 
 # Initialize db with this app
 db.init_app(app)        
