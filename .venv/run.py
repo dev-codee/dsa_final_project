@@ -1,7 +1,13 @@
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 from datetime import datetime
 from app.models.user import db, User
+from app.models.mongo_setup import live_locations_collection, ride_logs_collection
 from app.DataStructures.queue import RideRequestQueue
 from app.DataStructures.stack import UserRideHistoryManager
 from auth import auth_bp
@@ -13,9 +19,23 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 # Ensure instance directory exists
 instance_path = os.path.join(basedir, 'instance')
 os.makedirs(instance_path, exist_ok=True)
-# Set database URI
-db_path = os.path.join(instance_path, 'users.db')
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+# --- PostgreSQL Database Configuration ---
+# Set database URI to PostgreSQL instead of SQLite
+PG_USER = os.environ.get("PG_USER", "postgres")
+PG_PASSWORD = os.environ.get("PG_PASSWORD", "password")
+PG_DB = os.environ.get("PG_DB", "rides_db")
+PG_HOST = os.environ.get("PG_HOST", "localhost")
+PG_PORT = os.environ.get("PG_PORT", "5432")
+
+# We leave the SQLite URI here as a fallback for development if Postgres is not set up
+USE_POSTGRES = os.environ.get("USE_POSTGRES", "False").lower() in ["true", "1"]
+
+if USE_POSTGRES:
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}'
+else:
+    db_path = os.path.join(instance_path, 'users.db')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+    
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', '1234') 
 GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY', "AIzaSyDwpdSiu8lCLt9Y5ttql_MujzlSJgt-ig0")
@@ -85,7 +105,25 @@ def update_rider_location():
             'updated_at': datetime.now().isoformat()
         }
         
+        # In-memory update
         rider_locations[rider_email] = location
+        
+        # DISTRIBUTED DB DEMO (MongoDB)
+        # Store high-frequency streaming geo-events in MongoDB
+        if live_locations_collection is not None:
+            try:
+                live_locations_collection.insert_one({
+                    "rider_email": rider_email,
+                    "role": "rider",
+                    "location": {
+                        "type": "Point",
+                        # Notice how MongoDB represents coordinates as [longitude, latitude]
+                        "coordinates": [float(data.get('lng')), float(data.get('lat'))]
+                    },
+                    "timestamp": datetime.utcnow()
+                })
+            except Exception as e:
+                print(f"MongoDB warning: {e}")
         
         return jsonify({
             "success": True,
@@ -269,6 +307,24 @@ def request_ride():
         user_email = session.get('user_email', 'guest')
         user_active_requests[user_email] = ride_request
         
+        # ---------------------------------------------------------
+        # DISTRIBUTED DB DEMO (MongoDB)
+        # Unstructured Log of a new request
+        # ---------------------------------------------------------
+        if ride_logs_collection is not None:
+            try:
+                ride_logs_collection.insert_one({
+                    "event": "ride_requested",
+                    "ride_id": ride_request["id"],
+                    "user_email": user_email,
+                    "is_urgent": is_urgent,
+                    "pickup": ride_request["pickup"],
+                    "dropoff": ride_request["dropoff"],
+                    "timestamp": datetime.utcnow()
+                })
+            except Exception as e:
+                print(f"MongoDB warning: {e}")
+                
         return jsonify({
             "success": True,
             "message": f"{'Urgent ' if is_urgent else ''}Ride requested successfully",
@@ -469,6 +525,23 @@ def complete_ride():
         
         # Remove from active rides
         del active_rides[rider_email]
+        
+        # ---------------------------------------------------------
+        # DISTRIBUTED DB DEMO (MongoDB)
+        # Store permanent ride receipts (flexible structure)
+        # ---------------------------------------------------------
+        if ride_logs_collection is not None:
+            try:
+                ride_logs_collection.insert_one({
+                    "event": "ride_completed",
+                    "ride_id": completed_ride.get("id"),
+                    "rider_email": rider_email, # driver
+                    "user_email": user_email,   # passenger
+                    "completed_at": datetime.utcnow(),
+                    "ride_details": completed_ride
+                })
+            except Exception as e:
+                print(f"MongoDB warning: {e}")
         
         return jsonify({
             "success": True,
