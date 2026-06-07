@@ -7,14 +7,14 @@ except ImportError:
 
 # Set up MongoDB connection
 # You can change the connection URI via environment variable later if hosting on Atlas
-MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017/")
+MONGODB_URI = os.environ.get("MONGODB_URI", "mongodb://localhost:27017/")
 
 # Initialize the client
 try:
     if MongoClient is None:
         raise ImportError("pymongo module is not installed")
         
-    mongo_client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+    mongo_client = MongoClient(MONGODB_URI, serverSelectionTimeoutMS=5000)
     # The database for our project
     mongo_db = mongo_client['rides_cluster']
 

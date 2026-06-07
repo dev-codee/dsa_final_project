@@ -31,7 +31,14 @@ PG_PORT = os.environ.get("PG_PORT", "5432")
 USE_POSTGRES = os.environ.get("USE_POSTGRES", "False").lower() in ["true", "1"]
 
 if USE_POSTGRES:
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}'
+    # Vercel provides POSTGRES_URL. SQLAlchemy requires `postgresql://` instead of `postgres://`
+    database_url = os.environ.get("POSTGRES_URL") or os.environ.get("DATABASE_URL")
+    if database_url:
+        if database_url.startswith("postgres://"):
+            database_url = database_url.replace("postgres://", "postgresql://", 1)
+        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    else:
+        app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}'
 else:
     db_path = os.path.join(instance_path, 'users.db')
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
