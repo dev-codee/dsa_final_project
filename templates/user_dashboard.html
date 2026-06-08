@@ -892,33 +892,38 @@
         const service = new google.maps.DistanceMatrixService();
         service.getDistanceMatrix(
           {
-            origins: [pickupCoords],
-            destinations: [dropoffCoords],
+            origins: [{ lat: pickupCoords.lat, lng: pickupCoords.lng }],
+            destinations: [{ lat: dropoffCoords.lat, lng: dropoffCoords.lng }],
             travelMode: "DRIVING",
           },
           function (response, status) {
-            if (
-              status === "OK" &&
-              response.rows[0].elements[0].status !== "ZERO_RESULTS"
-            ) {
-              const result = response.rows[0].elements[0];
+            if (status === "OK") {
+              const elementStatus = response.rows[0].elements[0].status;
+              if (elementStatus === "OK") {
+                const result = response.rows[0].elements[0];
 
-              routeData = {
-                distance: result.distance.text,
-                duration: result.duration.text,
-                fares: {
-                  economy: Math.round(50 + (result.distance.value / 1000) * 15),
-                  comfort: Math.round(50 + (result.distance.value / 1000) * 20),
-                  premium: Math.round(50 + (result.distance.value / 1000) * 30),
-                },
-              };
+                routeData = {
+                  distance: result.distance.text,
+                  duration: result.duration.text,
+                  fares: {
+                    economy: Math.round(50 + (result.distance.value / 1000) * 15),
+                    comfort: Math.round(50 + (result.distance.value / 1000) * 20),
+                    premium: Math.round(50 + (result.distance.value / 1000) * 30),
+                  },
+                };
 
-              showRouteDetails(routeData);
-              displayRoute();
-              hideLoading();
+                showRouteDetails(routeData);
+                displayRoute();
+                hideLoading();
+              } else {
+                showError(
+                  "Google Maps could not find a driving route between these points. (Status: " + elementStatus + ")"
+                );
+                hideLoading();
+              }
             } else {
               showError(
-                "Google Maps could not find a driving route between these points."
+                "Google Maps API failed. (Status: " + status + ")"
               );
               hideLoading();
             }
@@ -948,8 +953,8 @@
 
       function displayRoute() {
         const request = {
-          origin: pickupCoords,
-          destination: dropoffCoords,
+          origin: { lat: pickupCoords.lat, lng: pickupCoords.lng },
+          destination: { lat: dropoffCoords.lat, lng: dropoffCoords.lng },
           travelMode: "DRIVING",
         };
 
@@ -957,7 +962,7 @@
           if (status === "OK") {
             directionsRenderer.setDirections(result);
           } else {
-            showError("Could not display route");
+            showError("Could not display route (Status: " + status + ")");
           }
         });
       }
