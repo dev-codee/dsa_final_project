@@ -16,6 +16,7 @@ except Exception as e:
 from app.DataStructures.queue import RideRequestQueue
 from app.DataStructures.stack import UserRideHistoryManager
 from auth import auth_bp
+from sqlalchemy.pool import NullPool
 
 app = Flask(__name__)
 
@@ -48,6 +49,10 @@ if USE_POSTGRES:
         app.config['SQLALCHEMY_DATABASE_URI'] = database_url
     else:
         app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}'
+    
+    # In Serverless environments (like Vercel), connection pooling causes connections to leak 
+    # and exhaust the database limit. NullPool forces a new connection for every request.
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'poolclass': NullPool}
 else:
     db_path = os.path.join('/tmp', 'users.db') if IS_VERCEL else os.path.join(instance_path, 'users.db')
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
